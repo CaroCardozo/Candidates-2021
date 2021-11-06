@@ -13,6 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  dynamic_reconfigure
+  message_generation
+  message_runtime
+  actionlib_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -22,7 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+#catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -41,7 +45,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
+##?????   * add "message_runtime" and every package in MSG_DEP_SET to
 ##     catkin_package(CATKIN_DEPENDS ...)
 ##   * uncomment the add_*_files sections below as needed
 ##     and list every .msg/.srv/.action file to be processed
@@ -49,31 +53,36 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+   geometry.msg
+   moveit.msg
+)
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+   FK.srv
+)
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+ add_action_files(
+   DIRECTORY actions
+   FILES
+   mechanism_client.action
+   arm.action
+   neck.action
+   body.action
+ )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   moveit_msgs#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   geometry_msgs
+   moveit_msgs
+   std_msgs
+   actionlib_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -90,10 +99,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+ generate_dynamic_reconfigure_options(
+   cfg/NeckConf.cfg
+   cfg/ArmConf.cfg
+   cfg/BodyConf.cfg
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -106,9 +116,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES system_stimuli
-#  CATKIN_DEPENDS geometry_msgs moveit_msgs roscpp rospy std_msgs
-#  DEPENDS system_lib
+  LIBRARIES system_stimuli
+  CATKIN_DEPENDS geometry_msgs moveit_msgs roscpp rospy std_msgs message_generation actionlib_msgs
+  DEPENDS system_lib
 )
 
 ###########
@@ -123,9 +133,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/system_stimuli.cpp
-# )
+ add_library(${HomeInt}
+   src/${HomeInt}/system_stimuli.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -135,7 +145,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/system_stimuli_node.cpp)
+
+add_executable(${PROJECT_NAME}_node src/system_stimuli_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -199,10 +210,10 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_system_stimuli.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+ catkin_add_gtest(${PROJECT_NAME}-test test/test_system_stimuli.cpp)
+ if(TARGET ${PROJECT_NAME}-test)
+   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+ endif()
 
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+ catkin_add_nosetests(test)
